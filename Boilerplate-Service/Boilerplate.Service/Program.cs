@@ -12,6 +12,9 @@ using Host = Microsoft.Extensions.Hosting.Host;
 
 namespace Boilerplate.Service
 {
+    /// <summary>
+    /// Boilerplate Service Program class
+    /// </summary>
     internal class Program
     {
         static void Main(string[] args)
@@ -41,6 +44,11 @@ namespace Boilerplate.Service
             });
         }
 
+        /// <summary>
+        /// Create HostBuilder
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
 #if DEBUG
@@ -53,6 +61,9 @@ namespace Boilerplate.Service
                 {
                     configHost.SetBasePath(Directory.GetCurrentDirectory());
                     configHost.AddJsonFile("appsettings.json", optional: true);
+#if DEBUG
+                    configHost.AddJsonFile("appsettings.Development.json", optional: true);
+#endif
                     configHost.AddEnvironmentVariables(prefix: "PREFIX_");
                     configHost.AddCommandLine(args);
                 })

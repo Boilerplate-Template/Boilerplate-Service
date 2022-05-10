@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace Boilerplate.Web
 {
+    /// <summary>
+    /// Boilerplate Web Program class
+    /// </summary>
     public class Program
     {
         public static void Main(string[] args)
@@ -17,6 +20,11 @@ namespace Boilerplate.Web
             CreateHostBuilder(args).Build().Run();
         }
 
+        /// <summary>
+        /// Create HostBuilder
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
 #if DEBUG
@@ -28,7 +36,10 @@ namespace Boilerplate.Web
                 .ConfigureHostConfiguration(configHost =>
                 {
                     configHost.SetBasePath(Directory.GetCurrentDirectory());
-                    configHost.AddJsonFile("hostsettings.json", optional: true);
+                    configHost.AddJsonFile("appsettings.json", optional: true);
+#if DEBUG
+                    configHost.AddJsonFile("appsettings.Development.json", optional: true);
+#endif
                     configHost.AddEnvironmentVariables(prefix: "PREFIX_");
                     configHost.AddCommandLine(args);
                 })
