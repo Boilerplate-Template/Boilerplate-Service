@@ -36,9 +36,11 @@ namespace Boilerplate.Web.Controllers
         ///     POST /Todo/1
         ///
         /// </remarks>
-        /// <response code="201">Returns the newly created item</response>
+        /// <response code="200">Returns the todo item</response>
         /// <response code="400">If the item is null</response>
+        /// <response code="404">If the item is null</response>
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<TodoItem?> Get(long id)
@@ -81,6 +83,8 @@ namespace Boilerplate.Web.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        /// <response code="400">If the item is null</response>
+        /// <response code="406">If the item is null</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -23,7 +23,11 @@ namespace Boilerplate.Service
             {
                 x.Service<IHost>(s =>
                 {
-                    s.ConstructUsing(() => CreateHostBuilder(args).Build());
+                    s.ConstructUsing(() => {
+                        var host = CreateHostBuilder(args).Build();
+                        Boilerplate.Web.Program.CreateDbIfNotExistsAsync(host).Wait();
+                        return host;
+                    });
                     s.WhenStarted(service =>
                     {
                         service.Start();
@@ -64,7 +68,7 @@ namespace Boilerplate.Service
 #if DEBUG
                     configHost.AddJsonFile("appsettings.Development.json", optional: true);
 #endif
-                    configHost.AddEnvironmentVariables(prefix: "PREFIX_");
+                    //configHost.AddEnvironmentVariables(prefix: "PREFIX_");
                     configHost.AddCommandLine(args);
                 })
                 //.UseSerilog()

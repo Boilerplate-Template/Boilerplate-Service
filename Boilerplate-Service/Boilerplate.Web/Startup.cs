@@ -14,6 +14,8 @@ using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json.Converters;
 using System.Reflection;
+using Boilerplate.Web.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace Boilerplate.Web
 {
@@ -42,13 +44,22 @@ namespace Boilerplate.Web
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            #region EntityFramework
+            services.AddDbContext<BoilerplateContext>(options =>
+                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDatabaseDeveloperPageExceptionFilter();
+            #endregion
+
+            #region MVC & Razor pages
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
                     options.SerializerSettings.Converters.Add(new StringEnumConverter()));
             services.AddEndpointsApiExplorer();            
             services.AddRazorPages()
                 .AddNewtonsoftJson(options =>
                     options.SerializerSettings.Converters.Add(new StringEnumConverter()));
+            #endregion
 
+            #region Swagger
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo
@@ -74,8 +85,9 @@ namespace Boilerplate.Web
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             });
             services.AddSwaggerGenNewtonsoftSupport(); // explicit opt-in - needs to be placed after AddSwaggerGen()
-            //services.AddMvcCore()
-            //    .AddApiExplorer();
+                                                       //services.AddMvcCore()
+                                                       //    .AddApiExplorer();
+            #endregion
         }
 
         /// <summary>
