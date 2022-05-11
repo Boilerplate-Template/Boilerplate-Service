@@ -2,6 +2,7 @@
 using Boilerplate.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Filters;
 using System.Linq;
 
 namespace Boilerplate.Web.Controllers
@@ -43,6 +44,7 @@ namespace Boilerplate.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [SwaggerRequestExample(typeof(TodoItem), typeof(TodoItemExample))]
         public async Task<TodoItem?> Get(long id)
         {
             return await _context.TodoItems.FirstOrDefaultAsync(item => item.Id == id);

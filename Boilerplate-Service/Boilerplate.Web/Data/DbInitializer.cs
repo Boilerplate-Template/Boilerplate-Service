@@ -14,7 +14,8 @@ namespace Boilerplate.Web.Data
         /// <param name="context"></param>
         public static async Task InitializeAsync(BoilerplateContext context)
         {
-            await context.Database.EnsureDeletedAsync();
+            // Delete Db
+            //await context.Database.EnsureDeletedAsync();
             await context.Database.EnsureCreatedAsync();
 
             // Look for any todoItems.

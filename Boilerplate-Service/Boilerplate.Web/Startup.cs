@@ -16,6 +16,7 @@ using Newtonsoft.Json.Converters;
 using System.Reflection;
 using Boilerplate.Web.Context;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace Boilerplate.Web
 {
@@ -80,13 +81,26 @@ namespace Boilerplate.Web
                     }
                 });
 
+                #region Swagger filter
+                options.ExampleFilters();
+
+                // if you're using the SecurityRequirementsOperationFilter, you also need to tell Swashbuckle you're using OAuth2
+                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    Description = "Standard Authorization header using the Bearer scheme. Example: \"bearer {token}\"",
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
+                #endregion
+
                 // 주석 연동이 되도록 세팅
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             });
             services.AddSwaggerGenNewtonsoftSupport(); // explicit opt-in - needs to be placed after AddSwaggerGen()
-                                                       //services.AddMvcCore()
-                                                       //    .AddApiExplorer();
+            //services.AddMvcCore()
+            //    .AddApiExplorer();            
             #endregion
         }
 
