@@ -119,7 +119,6 @@ namespace Boilerplate.Web.Controllers
             todoItem.Created = DateTime.Now;
 
             _context.TodoItems.Add(todoItem);
-            //await _context.TodoItems.Persist(this.Mapper).InsertOrUpdateAsync<TodoItemDTO>(todoItemDto);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(
@@ -128,8 +127,6 @@ namespace Boilerplate.Web.Controllers
                 this.Mapper.Map<TodoItemDTO>(todoItem));
         }
 
-        // PUT: api/TodoItemsTest/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         /// <summary>
         /// Update a TodoItem.
         /// </summary>
@@ -147,7 +144,6 @@ namespace Boilerplate.Web.Controllers
             }
 
             // 올려진 값 그대로 저장할 때 사용
-            //_context.Entry(todoItem).State = EntityState.Modified;
             var todoItem = await _context.TodoItems.FindAsync(id);
             if (todoItem == null)
             {
@@ -159,6 +155,9 @@ namespace Boilerplate.Web.Controllers
             todoItem.IsComplete = todoItemDto.IsComplete;
             todoItem.Description = todoItemDto.Description;
             todoItem.Updated = DateTime.Now;
+
+            // 업데이트를 해야 한다고 플래그 변경
+            _context.Entry(todoItem).State = EntityState.Modified;
 
             try
             {
