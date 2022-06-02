@@ -21,6 +21,9 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Hellang.Middleware.ProblemDetails;
 using Hellang.Middleware.ProblemDetails.Mvc;
+using AutoMapper.Data;
+using Boilerplate.Web.Models;
+using AutoMapper;
 
 namespace Boilerplate.Web
 {
@@ -95,11 +98,22 @@ namespace Boilerplate.Web
                 //https://docs.microsoft.com/ko-kr/aspnet/core/web-api/handle-errors?view=aspnetcore-6.0#implement-problemdetailsfactory
                 options.ClientErrorMapping[StatusCodes.Status404NotFound].Link = "https://httpstatuses.com/404";
             })
-            .AddNewtonsoftJson(options => options.SerializerSettings.Converters.Add(new StringEnumConverter()));
+            .AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.Converters.Add(new StringEnumConverter());
+                options.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.RoundtripKind;
+                options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK";
+                //options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd' 'HH':'mm':'ss";
+            });
             services.AddEndpointsApiExplorer();            
             services.AddRazorPages()
                 .AddNewtonsoftJson(options =>
-                    options.SerializerSettings.Converters.Add(new StringEnumConverter()));
+                {
+                    options.SerializerSettings.Converters.Add(new StringEnumConverter());
+                    options.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.RoundtripKind;
+                    options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK";
+                    //options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd' 'HH':'mm':'ss";
+                });
             #endregion
 
             #region Swagger
@@ -144,6 +158,26 @@ namespace Boilerplate.Web
             services.AddSwaggerExamples();
             //services.AddMvcCore()
             //    .AddApiExplorer();            
+            #endregion
+
+            #region AutoMapper
+            //Mapper.Initialize(cfg =>
+            //{
+            //    cfg.AddCollectionMappers();
+            //    cfg.SetGeneratePropertyMaps<GenerateEntityFrameworkPrimaryKeyPropertyMaps<DB>>();
+            //    // Configuration code
+            //});
+
+            services.AddAutoMapper((serviceProvider, automapper) => {
+                // todo ∞À≈‰ ¡ﬂ
+                //automapper.AddCollectionMappers();
+                //automapper.UseEntityFrameworkCoreModel<BoilerplateContext>(serviceProvider);
+
+                //automapper.AddExpressionMapping();
+                automapper.AddDataReaderMapping();
+                automapper.CreateMap<TodoItem, TodoItemDTO>();
+                automapper.CreateMap<TodoItemDTO, TodoItem>();
+            }, typeof(BoilerplateContext).Assembly);
             #endregion
         }
 

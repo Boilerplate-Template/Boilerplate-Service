@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Boilerplate.Web.Controllers
@@ -8,6 +9,17 @@ namespace Boilerplate.Web.Controllers
     /// </summary>
     public class GeneralController : CommonControllerBase
     {
+        /// <summary>
+        /// GeneralController Constructor
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="mapper"></param>
+        public GeneralController(ILogger<TodoItemsController> logger, IMapper mapper)
+            : base(logger, mapper)
+        {
+            
+        }
+
         /// <summary>
         /// Fire Exception
         /// </summary>

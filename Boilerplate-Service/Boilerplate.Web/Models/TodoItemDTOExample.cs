@@ -5,15 +5,15 @@ namespace Boilerplate.Web.Models
     /// <summary>
     /// TodoItem Example class
     /// </summary>
-    public class TodoItemExample : IExamplesProvider<TodoItem>
+    public class TodoItemDTOExample : IExamplesProvider<TodoItemDTO>
     {
         /// <summary>
         /// Get Examples
         /// </summary>
         /// <returns></returns>
-        public TodoItem GetExamples()
+        public TodoItemDTO GetExamples()
         {
-            return new TodoItem
+            return new TodoItemDTO
             {
                 Name = "new todo item",
                 Description = "새로운 할 일",

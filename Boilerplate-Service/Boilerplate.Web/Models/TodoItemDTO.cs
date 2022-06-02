@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 namespace Boilerplate.Web.Models
 {
     /// <summary>
-    /// Todo item class
+    /// TodoItem DTO class
     /// </summary>
-    public class TodoItem
+    public class TodoItemDTO
     {
         /// <summary>
         /// Identity
@@ -48,7 +48,5 @@ namespace Boilerplate.Web.Models
         /// </summary>
         [DataType(DataType.DateTime)]
         public DateTime? Deleted { get; set; } = null;
-
-        public string? Secret { get; set; }
     }
 }
