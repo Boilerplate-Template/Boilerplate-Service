@@ -7,10 +7,7 @@ namespace Boilerplate.Web.Controllers
     /// <summary>
     /// Values Controller 
     /// </summary>
-    [Route("api/[controller]")]
-    [Produces("application/json")]
-    [ApiController]
-    public class ValuesController : ControllerBase
+    public class ValuesController : CommonControllerBase
     {
         /// <summary>
         /// <![CDATA[GET: api/<ValuesController>]]>

@@ -19,6 +19,8 @@ using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
+using Hellang.Middleware.ProblemDetails;
+using Hellang.Middleware.ProblemDetails.Mvc;
 
 namespace Boilerplate.Web
 {
@@ -27,14 +29,6 @@ namespace Boilerplate.Web
     /// </summary>
     public class Startup
     {
-        /// <summary>
-        /// Startup method
-        /// </summary>
-        /// <param name="configuration"></param>
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
 
         /// <summary>
         /// Configuration
@@ -42,14 +36,36 @@ namespace Boilerplate.Web
         public IConfiguration Configuration { get; }
 
         /// <summary>
+        /// Environment
+        /// </summary>
+        private IWebHostEnvironment CurrentEnvironment { get; }
+
+        /// <summary>
+        /// Startup method
+        /// </summary>
+        /// <param name="configuration">configuration</param>
+        /// <param name="environment">environment</param>
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        {
+            Configuration = configuration;
+            CurrentEnvironment = environment;
+        }
+
+        /// <summary>
         /// This method gets called by the runtime. Use this method to add services to the container.
         /// </summary>
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddProblemDetails(ConfigureProblemDetails);
+
             #region EntityFramework
             services.AddDbContext<BoilerplateContext>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            {
+                //options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseInMemoryDatabase("BoilerplateData.db");
+            });
+                
             services.AddDatabaseDeveloperPageExceptionFilter();
             #endregion
 
@@ -57,6 +73,27 @@ namespace Boilerplate.Web
             services.AddControllersWithViews(options => {
                 // Global Antiforgery Options
                 //options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            })
+            // Adds MVC conventions to work better with the ProblemDetails middleware.
+            .AddProblemDetailsConventions()
+            .ConfigureApiBehaviorOptions(options => {
+                //options.SuppressConsumesConstraintForFormFileParameters = true;
+                //options.SuppressInferBindingSourcesForParameters = true;
+                //options.SuppressModelStateInvalidFilter = true;
+
+                //options.InvalidModelStateResponseFactory = context =>
+                //    new BadRequestObjectResult(context.ModelState)
+                //    {
+                //        ContentTypes =
+                //        {
+                //            // using static System.Net.Mime.MediaTypeNames;
+                //            Application.Json
+                //        }
+                //    };
+
+                // 에러 페이지 매핑
+                //https://docs.microsoft.com/ko-kr/aspnet/core/web-api/handle-errors?view=aspnetcore-6.0#implement-problemdetailsfactory
+                options.ClientErrorMapping[StatusCodes.Status404NotFound].Link = "https://httpstatuses.com/404";
             })
             .AddNewtonsoftJson(options => options.SerializerSettings.Converters.Add(new StringEnumConverter()));
             services.AddEndpointsApiExplorer();            
@@ -119,7 +156,13 @@ namespace Boilerplate.Web
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                #region 개발 시 에러 페이지 리턴 형식 지정
+                // 에러시 개발 페이지 형식으로 에러 페이지 표시
+                //app.UseDeveloperExceptionPage();
+                // 에러시 json 형식으로 에러 정보 표시
+                app.UseProblemDetails();
+                #endregion
+
                 app.UseSwagger();
                 app.UseSwaggerUI(options => {
                     // Swagger에서 사용하는 CSS 추가
@@ -144,10 +187,21 @@ namespace Boilerplate.Web
                 //    return next(context);
                 //});
                 //#endregion
+
+                // /api-docs ReDoc 문서도 추가로 등록 함
+                app.UseReDoc(c =>
+                {
+                    c.DocumentTitle = "REDOC API Documentation";
+                    c.SpecUrl = "/swagger/v1/swagger.json";
+                });
+
+                // 에러시 개발 페이지 형식으로 에러 페이지 표시
+                //app.UseExceptionHandler("/error-development");
             }
             else
             {
                 app.UseExceptionHandler("/Error");
+
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
@@ -173,6 +227,41 @@ namespace Boilerplate.Web
                 options.SwaggerEndpoint("v1/swagger.json", "V1");
                 options.RoutePrefix = string.Empty;
             });
+        }
+
+        private void ConfigureProblemDetails(ProblemDetailsOptions options)
+        {
+            // Only include exception details in a development environment. There's really no nee
+            // to set this as it's the default behavior. It's just included here for completeness :)
+            options.IncludeExceptionDetails = (ctx, env) => CurrentEnvironment.IsDevelopment() || CurrentEnvironment.IsStaging();
+
+            // use custom exception class
+            //setup.Map<ProductCustomException>(exception => new ProblemDetails
+            //{
+            //    Title = exception.Title,
+            //    Detail = exception.Detail,
+            //    Status = StatusCodes.Status500InternalServerError,
+            //    Type = exception.Type,
+            //    Instance = exception.Instance,
+            //    Extensions[“additionalInfo”] = exception.AdditionalInfo // this already creates a property and can be reused as much as necessary
+            //});
+
+            // Custom mapping function for FluentValidation's ValidationException.
+            //options.MapFluentValidationException();
+
+            // You can configure the middleware to re-throw certain types of exceptions, all exceptions or based on a predicate.
+            // This is useful if you have upstream middleware that needs to do additional handling of exceptions.
+            options.Rethrow<NotSupportedException>();
+
+            // This will map NotImplementedException to the 501 Not Implemented status code.
+            options.MapToStatusCode<NotImplementedException>(StatusCodes.Status501NotImplemented);
+
+            // This will map HttpRequestException to the 503 Service Unavailable status code.
+            options.MapToStatusCode<HttpRequestException>(StatusCodes.Status503ServiceUnavailable);
+
+            // Because exceptions are handled polymorphically, this will act as a "catch all" mapping, which is why it's added last.
+            // If an exception other than NotImplementedException and HttpRequestException is thrown, this will handle it.
+            options.MapToStatusCode<Exception>(StatusCodes.Status500InternalServerError);
         }
     }
 }

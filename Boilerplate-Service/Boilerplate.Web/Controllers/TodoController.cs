@@ -10,9 +10,7 @@ namespace Boilerplate.Web.Controllers
     /// <summary>
     /// Todo Controller
     /// </summary>
-    [ApiController]
-    [Route("api/[controller]")]
-    public class TodoController : ControllerBase
+    public class TodoController : CommonControllerBase
     {
         private readonly BoilerplateContext _context;
 
@@ -26,6 +24,23 @@ namespace Boilerplate.Web.Controllers
         }
 
         /// <summary>
+        /// Get TodoItem collection.
+        /// </summary>
+        /// <returns>TodoItem collection</returns>
+        /// <remarks>
+        /// Sample request:
+        /// 
+        ///     GET /Todo
+        ///     
+        /// </remarks>
+        /// <response code="200">Returns the todo item collection</response>
+        [HttpGet]
+        public async Task<ICollection<TodoItem>> Get()
+        {
+            return await _context.TodoItems.ToListAsync();
+        }
+
+        /// <summary>
         /// Get a TodoItem.
         /// </summary>
         /// <param name="id"></param>
@@ -33,7 +48,7 @@ namespace Boilerplate.Web.Controllers
         /// <remarks>
         /// Sample request:
         ///
-        ///     POST /Todo/1
+        ///     GET /Todo/1
         ///
         /// </remarks>
         /// <response code="200">Returns the todo item</response>
@@ -43,9 +58,15 @@ namespace Boilerplate.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<TodoItem?> Get(long id)
+        public async Task<ActionResult<TodoItem?>> Get(long id)
         {
-            return await _context.TodoItems.FirstOrDefaultAsync(item => item.Id == id);
+            var todoItem = await _context.TodoItems.FirstOrDefaultAsync(item => item.Id == id);
+            if(todoItem == null)
+            {
+                return NotFound();
+            }
+
+            return todoItem;
         }
 
         /// <summary>
@@ -70,6 +91,7 @@ namespace Boilerplate.Web.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [SwaggerRequestExample(typeof(TodoItem), typeof(TodoItemExample))]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(TodoItemExample))]
         // todo : Swagger에서 Antiforgery 사용가능한지 체크 해야 함
         //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TodoItem item)

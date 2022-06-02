@@ -15,7 +15,10 @@ namespace Boilerplate.Web.Models
         {
             return new TodoItem
             {
-                Name = "new todo item", Description = "새로운 할 일", Created = DateTime.Now, IsComplete = false
+                Name = "new todo item",
+                Description = "새로운 할 일",
+                Created = DateTime.Now,
+                IsComplete = false
             };
         }
     }
