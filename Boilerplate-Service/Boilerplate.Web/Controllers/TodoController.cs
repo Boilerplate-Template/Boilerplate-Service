@@ -12,7 +12,6 @@ namespace Boilerplate.Web.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Produces("application/json")]
     public class TodoController : ControllerBase
     {
         private readonly BoilerplateContext _context;
@@ -44,7 +43,6 @@ namespace Boilerplate.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [SwaggerRequestExample(typeof(TodoItem), typeof(TodoItemExample))]
         public async Task<TodoItem?> Get(long id)
         {
             return await _context.TodoItems.FirstOrDefaultAsync(item => item.Id == id);
@@ -71,7 +69,9 @@ namespace Boilerplate.Web.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ValidateAntiForgeryToken]
+        [SwaggerRequestExample(typeof(TodoItem), typeof(TodoItemExample))]
+        // todo : Swagger에서 Antiforgery 사용가능한지 체크 해야 함
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TodoItem item)
         {
             _context.TodoItems.Add(item);

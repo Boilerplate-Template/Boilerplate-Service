@@ -17,6 +17,8 @@ using System.Reflection;
 using Boilerplate.Web.Context;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Filters;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Boilerplate.Web
 {
@@ -52,8 +54,11 @@ namespace Boilerplate.Web
             #endregion
 
             #region MVC & Razor pages
-            services.AddControllersWithViews().AddNewtonsoftJson(options =>
-                    options.SerializerSettings.Converters.Add(new StringEnumConverter()));
+            services.AddControllersWithViews(options => {
+                // Global Antiforgery Options
+                //options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            })
+            .AddNewtonsoftJson(options => options.SerializerSettings.Converters.Add(new StringEnumConverter()));
             services.AddEndpointsApiExplorer();            
             services.AddRazorPages()
                 .AddNewtonsoftJson(options =>
@@ -68,16 +73,16 @@ namespace Boilerplate.Web
                     Version = "v1",
                     Title = "Boilerplate API",
                     Description = "Boilerplate API 온라인 문서입니다.",
-                    TermsOfService = new Uri("https://example.com/terms"),
+                    TermsOfService = new Uri("https://www.example.com/terms"),
                     Contact = new OpenApiContact
                     {
                         Name = "연락정보",
-                        Url = new Uri("https://example.com/contact")
+                        Url = new Uri("https://www.example.com/contact")
                     },
                     License = new OpenApiLicense
                     {
                         Name = "라이선스",
-                        Url = new Uri("https://example.com/license")
+                        Url = new Uri("https://www.example.com/license")
                     }
                 });
 
@@ -99,6 +104,7 @@ namespace Boilerplate.Web
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             });
             services.AddSwaggerGenNewtonsoftSupport(); // explicit opt-in - needs to be placed after AddSwaggerGen()
+            services.AddSwaggerExamples();
             //services.AddMvcCore()
             //    .AddApiExplorer();            
             #endregion
@@ -115,7 +121,29 @@ namespace Boilerplate.Web
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(options => {
+                    // Swagger에서 사용하는 CSS 추가
+                    //options.InjectStylesheet("/swagger-ui/custom.css");
+                });
+
+                // todo : Swagger에서 Antiforgery 사용가능한지 체크 해야 함
+                //#region Swagger Antiforgery 사용하도록 설정
+                //var antiforgery = app.ApplicationServices.GetRequiredService<IAntiforgery>();
+                //app.Use((context, next) =>
+                //{
+                //    var requestPath = context.Request.Path.Value;
+
+                //    if (string.Equals(requestPath, "/", StringComparison.OrdinalIgnoreCase)
+                //        || string.Equals(requestPath, "/index.html", StringComparison.OrdinalIgnoreCase))
+                //    {
+                //        var tokenSet = antiforgery.GetAndStoreTokens(context);
+                //        context.Response.Cookies.Append("XSRF-TOKEN", tokenSet.RequestToken!,
+                //            new CookieOptions { HttpOnly = false });
+                //    }
+
+                //    return next(context);
+                //});
+                //#endregion
             }
             else
             {
