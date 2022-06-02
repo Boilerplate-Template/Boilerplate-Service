@@ -107,8 +107,8 @@ namespace Boilerplate.Web.Controllers
         /// <response code="201">Returns the newly created item</response>
         /// <response code="400">If the item is null</response>
         [HttpPost]
-        //[ProducesResponseType(StatusCodes.Status201Created)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [SwaggerRequestExample(typeof(TodoItemDTO), typeof(TodoItemDTOExample))]
         //[SwaggerResponseExample(StatusCodes.Status200OK, typeof(TodoItemDTOExample))]
         // todo : Swagger에서 Antiforgery 사용가능한지 체크 해야 함
@@ -137,6 +137,7 @@ namespace Boilerplate.Web.Controllers
         /// <param name="todoItemDto"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
+        [SwaggerRequestExample(typeof(TodoItemDTO), typeof(TodoItemDTOExample))]        
         //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(long id, TodoItemDTO todoItemDto)
         {

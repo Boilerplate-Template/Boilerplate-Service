@@ -126,7 +126,7 @@ namespace Boilerplate.Web
                 options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK";
                 //options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd' 'HH':'mm':'ss";
             });
-            services.AddEndpointsApiExplorer();            
+            services.AddEndpointsApiExplorer();
             services.AddRazorPages()
                 .AddNewtonsoftJson(options =>
                 {
@@ -176,9 +176,8 @@ namespace Boilerplate.Web
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             });
             services.AddSwaggerGenNewtonsoftSupport(); // explicit opt-in - needs to be placed after AddSwaggerGen()
-            services.AddSwaggerExamples();
-            //services.AddMvcCore()
-            //    .AddApiExplorer();            
+            //services.AddSwaggerExamples();
+            services.AddSwaggerExamplesFromAssemblyOf<Startup>();
             #endregion
 
             #region AutoMapper
@@ -278,6 +277,7 @@ namespace Boilerplate.Web
                     pattern: "{controller=Home}/{action=Index}/{id?}");
 
                 endpoints.MapRazorPages();
+                endpoints.MapSwagger();
             });
 
             app.UseSwaggerUI(options =>

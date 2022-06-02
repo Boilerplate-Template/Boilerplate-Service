@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Boilerplate.Service", "Boilerplate.Service\Boilerplate.Service.csproj", "{FED2F206-7399-40DD-B38C-B69AF29D9E7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Boilerplate.Service", "Boilerplate.Service\Boilerplate.Service.csproj", "{FED2F206-7399-40DD-B38C-B69AF29D9E7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Boilerplate.Web", "Boilerplate.Web\Boilerplate.Web.csproj", "{3CB7341E-1EAA-43B8-A7C4-5657F03DEE48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Boilerplate.Web", "Boilerplate.Web\Boilerplate.Web.csproj", "{3CB7341E-1EAA-43B8-A7C4-5657F03DEE48}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
