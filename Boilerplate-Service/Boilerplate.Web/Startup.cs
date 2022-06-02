@@ -24,6 +24,8 @@ using Hellang.Middleware.ProblemDetails.Mvc;
 using AutoMapper.Data;
 using Boilerplate.Web.Models;
 using AutoMapper;
+using Microsoft.AspNetCore.ResponseCompression;
+using System.IO.Compression;
 
 namespace Boilerplate.Web
 {
@@ -61,6 +63,25 @@ namespace Boilerplate.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddProblemDetails(ConfigureProblemDetails);
+
+            #region Response Compression
+            services.AddResponseCompression(options =>
+            {
+                //https://docs.microsoft.com/ko-kr/aspnet/core/performance/response-compression?view=aspnetcore-6.0
+                options.EnableForHttps = true;
+                options.Providers.Add<BrotliCompressionProvider>();
+                options.Providers.Add<GzipCompressionProvider>();
+            });
+            services.Configure<BrotliCompressionProviderOptions>(options =>
+            {
+                options.Level = CompressionLevel.Fastest;
+            });
+
+            services.Configure<GzipCompressionProviderOptions>(options =>
+            {
+                options.Level = CompressionLevel.SmallestSize;
+            });
+            #endregion
 
             #region EntityFramework
             services.AddDbContext<BoilerplateContext>(options =>
@@ -238,6 +259,9 @@ namespace Boilerplate.Web
 
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
+
+                //https://docs.microsoft.com/ko-kr/aspnet/core/performance/response-compression?view=aspnetcore-6.0
+                app.UseResponseCompression();
             }
 
             app.UseHttpsRedirection();
