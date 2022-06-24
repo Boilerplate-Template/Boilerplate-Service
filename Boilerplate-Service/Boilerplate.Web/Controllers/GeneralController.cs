@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
 
 namespace Boilerplate.Web.Controllers
 {
@@ -40,6 +42,25 @@ namespace Boilerplate.Web.Controllers
                 //throw new Exception("This is an exception thrown from middleware.");
                 return await Task.FromResult(NotFound());
             }
+        }
+
+        /// <summary>
+        /// 파일 가져오기
+        /// </summary>
+        /// <param name="fileName">파일명</param>
+        /// <returns></returns>
+        [HttpGet("{fileName}")]
+        [Produces("application/octet-stream", Type = typeof(VirtualFileResult))]
+        public VirtualFileResult GetFile(string fileName)
+        {
+            // 임시폴더에서 파일 찾기
+            var filePath = Path.Combine(Path.GetTempPath(), fileName);
+            if (!System.IO.File.Exists(filePath))
+            {
+                throw new FileNotFoundException("파일이 없습니다.", fileName: fileName);
+            }
+
+            return File(virtualPath: fileName, contentType: "application/octet-stream", fileDownloadName: fileName);
         }
 
         /// <summary>
