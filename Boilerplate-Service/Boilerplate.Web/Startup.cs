@@ -87,10 +87,10 @@ namespace Boilerplate.Web
             services.AddDbContext<BoilerplateContext>(options =>
             {
                 // Sqlite를 사용할 때
-                //options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
 
                 // Memory DB를 사용할 때
-                options.UseInMemoryDatabase("BoilerplateData.db");
+                //options.UseInMemoryDatabase("BoilerplateData.db");
 
                 // MSSQL 사용 시 
                 //options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));

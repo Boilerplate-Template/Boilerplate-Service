@@ -5,6 +5,7 @@
 	<Nullable>enable</Nullable>
 	<ImplicitUsings>enable</ImplicitUsings>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<UserSecretsId>64ced02d-1fef-4211-ad23-5149716b19e7</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +18,8 @@
 	<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
 	<PackageReference Include="Hellang.Middleware.ProblemDetails" Version="6.4.2" />
 	<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.6" />
+	<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.6" />
+	<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.6" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.6" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.6" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.6" />
@@ -30,6 +33,10 @@
 	<PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.3" />
 	<PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.3.1" />
 	<PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="6.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\Identity\" />
   </ItemGroup>
 
 </Project>
