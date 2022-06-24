@@ -173,7 +173,19 @@ namespace Boilerplate.Web
                     Description = "Standard Authorization header using the Bearer scheme. Example: \"bearer {token}\"",
                     In = ParameterLocation.Header,
                     Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows
+                    {
+                        Implicit = new OpenApiOAuthFlow
+                        {
+                            AuthorizationUrl = new Uri("/auth-server/connect/authorize", UriKind.Relative),
+                            Scopes = new Dictionary<string, string>
+                            {
+                                { "readAccess", "Access read operations" },
+                                { "writeAccess", "Access write operations" }
+                            }
+                        }
+                    }
                 });
                 #endregion
 
@@ -294,6 +306,15 @@ namespace Boilerplate.Web
                 // xsrf token processing
                 //options.UseRequestInterceptor("(req) => { req.headers['XSRF-TOKEN'] = localStorage.getItem('xsrf-token'); return req; }");
                 options.UseRequestInterceptor("(req) => { debugger; req.headers['X-XSRF-TOKEN'] = (await cookieStore.get('XSRF-TOKEN')).value; return req; }");
+
+                // oauth
+                //options.OAuthClientId("test-id");
+                //options.OAuthClientSecret("test-secret");
+                //options.OAuthRealm("test-realm");
+                //options.OAuthAppName("test-app");
+                //options.OAuthScopeSeparator(" ");
+                //options.OAuthAdditionalQueryStringParams(new Dictionary<string, string> { { "foo", "bar" } });
+                //options.OAuthUseBasicAuthenticationWithAccessCodeGrant();
             });
         }
 
