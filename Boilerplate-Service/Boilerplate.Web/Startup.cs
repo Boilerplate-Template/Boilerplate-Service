@@ -86,8 +86,14 @@ namespace Boilerplate.Web
             #region EntityFramework
             services.AddDbContext<BoilerplateContext>(options =>
             {
+                // Sqlite를 사용할 때
                 //options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
+
+                // Memory DB를 사용할 때
                 options.UseInMemoryDatabase("BoilerplateData.db");
+
+                // MSSQL 사용 시 
+                //options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
                 
             services.AddDatabaseDeveloperPageExceptionFilter();
@@ -123,8 +129,8 @@ namespace Boilerplate.Web
             {
                 options.SerializerSettings.Converters.Add(new StringEnumConverter());
                 options.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.RoundtripKind;
-                options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK";
-                //options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd' 'HH':'mm':'ss";
+                //options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK";
+                options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd' 'HH':'mm':'ss";
             });
             services.AddEndpointsApiExplorer();
             services.AddRazorPages()
@@ -132,8 +138,8 @@ namespace Boilerplate.Web
                 {
                     options.SerializerSettings.Converters.Add(new StringEnumConverter());
                     options.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.RoundtripKind;
-                    options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK";
-                    //options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd' 'HH':'mm':'ss";
+                    //options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK";
+                    options.SerializerSettings.DateFormatString = "yyyy'-'MM'-'dd' 'HH':'mm':'ss";
                 });
             #endregion
 
@@ -224,23 +230,23 @@ namespace Boilerplate.Web
                 });
 
                 // todo : Swagger에서 Antiforgery 사용가능한지 체크 해야 함
-                //#region Swagger Antiforgery 사용하도록 설정
-                //var antiforgery = app.ApplicationServices.GetRequiredService<IAntiforgery>();
-                //app.Use((context, next) =>
-                //{
-                //    var requestPath = context.Request.Path.Value;
+                #region Swagger Antiforgery 사용하도록 설정
+                var antiforgery = app.ApplicationServices.GetRequiredService<IAntiforgery>();
+                app.Use((context, next) =>
+                {
+                    var requestPath = context.Request.Path.Value;
 
-                //    if (string.Equals(requestPath, "/", StringComparison.OrdinalIgnoreCase)
-                //        || string.Equals(requestPath, "/index.html", StringComparison.OrdinalIgnoreCase))
-                //    {
-                //        var tokenSet = antiforgery.GetAndStoreTokens(context);
-                //        context.Response.Cookies.Append("XSRF-TOKEN", tokenSet.RequestToken!,
-                //            new CookieOptions { HttpOnly = false });
-                //    }
+                    if (string.Equals(requestPath, "/", StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(requestPath, "/index.html", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var tokenSet = antiforgery.GetAndStoreTokens(context);
+                        context.Response.Cookies.Append("XSRF-TOKEN", tokenSet.RequestToken!,
+                            new CookieOptions { HttpOnly = false });
+                    }
 
-                //    return next(context);
-                //});
-                //#endregion
+                    return next(context);
+                });
+                #endregion
 
                 // /api-docs ReDoc 문서도 추가로 등록 함
                 app.UseReDoc(c =>
@@ -284,6 +290,10 @@ namespace Boilerplate.Web
             {
                 options.SwaggerEndpoint("v1/swagger.json", "V1");
                 options.RoutePrefix = string.Empty;
+
+                // xsrf token processing
+                //options.UseRequestInterceptor("(req) => { req.headers['XSRF-TOKEN'] = localStorage.getItem('xsrf-token'); return req; }");
+                options.UseRequestInterceptor("(req) => { debugger; req.headers['X-XSRF-TOKEN'] = (await cookieStore.get('XSRF-TOKEN')).value; return req; }");
             });
         }
 

@@ -210,22 +210,5 @@ namespace Boilerplate.Web.Controllers
         {
             return (_context.TodoItems?.Any(e => e.Id == id)).GetValueOrDefault();
         }
-
-        /// <summary>
-        /// TodoItem convert to TodoItemDTO 
-        /// </summary>
-        /// <param name="todoItem"></param>
-        /// <returns></returns>
-        private static TodoItemDTO ItemToDTO(TodoItem todoItem) =>
-            new TodoItemDTO
-            {
-                Id = todoItem.Id,
-                Name = todoItem.Name,
-                IsComplete = todoItem.IsComplete,
-                Description = todoItem.Description,
-                Updated = todoItem.Updated,
-                Created = todoItem.Created,
-                Deleted = todoItem.Deleted
-            };
     }
 }
