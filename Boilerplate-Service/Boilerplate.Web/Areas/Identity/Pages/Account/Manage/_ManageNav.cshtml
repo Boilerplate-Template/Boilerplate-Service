@@ -1,4 +1,6 @@
-﻿@inject SignInManager<IdentityWebUser> SignInManager
+﻿@using Boilerplate.Web.Models.Identity
+
+@inject SignInManager<IdentityWebUser> SignInManager
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }

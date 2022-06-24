@@ -6,11 +6,11 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Boilerplate.Web.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Boilerplate.Web.Models.Identity;
 
 namespace Boilerplate.Web.Areas.Identity.Pages.Account
 {

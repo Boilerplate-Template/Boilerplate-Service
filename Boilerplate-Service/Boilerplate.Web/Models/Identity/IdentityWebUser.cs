@@ -4,13 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 
-namespace Boilerplate.Web.Areas.Identity.Data;
+namespace Boilerplate.Web.Models.Identity;
 
 /// <summary>
 /// Add profile data for application users by adding properties to the BoilerplateWebUser class
 /// </summary>
 public class IdentityWebUser : IdentityUser
 {
-    
+
 }
 

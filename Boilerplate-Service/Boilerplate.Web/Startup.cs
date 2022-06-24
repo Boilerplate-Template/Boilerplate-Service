@@ -26,6 +26,7 @@ using Boilerplate.Web.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.ResponseCompression;
 using System.IO.Compression;
+using Boilerplate.Web.Models.Identity;
 
 namespace Boilerplate.Web
 {
@@ -95,7 +96,14 @@ namespace Boilerplate.Web
                 // MSSQL »ç¿ë ½Ã 
                 //options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            #region Set IdentityFramework
+            services.AddDefaultIdentity<IdentityWebUser>(options => {
                 
+            })
+                .AddEntityFrameworkStores<BoilerplateContext>();
+            #endregion
+
             services.AddDatabaseDeveloperPageExceptionFilter();
             #endregion
 

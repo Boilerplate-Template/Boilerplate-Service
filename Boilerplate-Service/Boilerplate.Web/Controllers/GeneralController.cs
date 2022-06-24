@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
@@ -61,6 +62,17 @@ namespace Boilerplate.Web.Controllers
             }
 
             return File(virtualPath: fileName, contentType: "application/octet-stream", fileDownloadName: fileName);
+        }
+
+        /// <summary>
+        /// Confidential page
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("Confidential")]
+        public IActionResult Confidential()
+        {
+            return NoContent();   
         }
 
         /// <summary>
