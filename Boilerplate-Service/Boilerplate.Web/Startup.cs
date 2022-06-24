@@ -27,6 +27,9 @@ using AutoMapper;
 using Microsoft.AspNetCore.ResponseCompression;
 using System.IO.Compression;
 using Boilerplate.Web.Models.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 
 namespace Boilerplate.Web
 {
@@ -88,23 +91,72 @@ namespace Boilerplate.Web
             services.AddDbContext<BoilerplateContext>(options =>
             {
                 // Sqlite를 사용할 때
-                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found."));
 
                 // Memory DB를 사용할 때
                 //options.UseInMemoryDatabase("BoilerplateData.db");
 
                 // MSSQL 사용 시 
-                //options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                //options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found."));
             });
 
             #region Set IdentityFramework
             services.AddDefaultIdentity<IdentityWebUser>(options => {
-                
+                options.SignIn.RequireConfirmedAccount = true;
             })
                 .AddEntityFrameworkStores<BoilerplateContext>();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Password settings.
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequiredLength = 6;
+                options.Password.RequiredUniqueChars = 1;
+
+                // Lockout settings.
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
+
+                // User settings.
+                options.User.AllowedUserNameCharacters =
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                options.User.RequireUniqueEmail = false;
+            });
             #endregion
 
             services.AddDatabaseDeveloperPageExceptionFilter();
+            #endregion
+
+            #region Authentication
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => Configuration.Bind("JwtSettings", options))
+            //    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => {
+            //        // Cookie settings
+            //        options.Cookie.HttpOnly = true;
+            //        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+
+            //        options.LoginPath = "/Identity/Account/Login";
+            //        options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+            //        options.SlidingExpiration = true;
+
+            //        Configuration.Bind("CookieSettings", options);
+            //    });
+
+            services.AddAuthentication()
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Account/Unauthorized/";
+                    options.AccessDeniedPath = "/Account/Forbidden/";
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.Audience = "http://localhost:5001/";
+                    options.Authority = "http://localhost:5000/";
+                });
             #endregion
 
             #region MVC & Razor pages

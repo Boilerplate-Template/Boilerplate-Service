@@ -2,6 +2,7 @@
 //Console.WriteLine("Hello, World!");
 
 using Boilerplate.Web;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -21,12 +22,15 @@ namespace Boilerplate.Service
         {
             HostFactory.Run(x =>
             {
-                x.Service<IHost>(s =>
+                x.Service<WebApplication>(s =>
                 {
                     s.ConstructUsing(() => {
-                        var host = CreateHostBuilder(args).Build();
-                        Boilerplate.Web.Program.CreateDbIfNotExistsAsync(host).Wait();
-                        return host;
+#if DEBUG
+                        var environmentName = Environments.Development;
+#else
+                        var environmentName = Environments.Production;
+#endif
+                        return Boilerplate.Web.Program.ServerStart(args, isService: true, environmentName: environmentName);
                     });
                     s.WhenStarted(service =>
                     {
@@ -35,7 +39,7 @@ namespace Boilerplate.Service
 
                     s.WhenStopped(service =>
                     {
-                        service.StopAsync();
+                        service.StopAsync().Wait(10 * 1000);
                     });
                 });
 
