@@ -67,6 +67,8 @@ namespace Boilerplate.Web
         /// <exception cref="InvalidOperationException"></exception>
         public static WebApplication ServerStart(string[] args, bool isService = false, string environmentName = "Production")
         {
+            var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
             var builder = WebApplication.CreateBuilder(new WebApplicationOptions
             {
                 Args = args,
@@ -74,8 +76,37 @@ namespace Boilerplate.Web
                 EnvironmentName = environmentName
             });
 
+            var logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Configuration)
+                .Enrich.FromLogContext()
+                .CreateLogger();
+
+            builder.Logging.ClearProviders();
+            builder.Logging.AddSerilog(logger);
+
             Configuration = builder.Configuration;
             CurrentEnvironment = builder.Environment;
+
+            #region Set CORS site
+            builder.Services.AddCors(options =>
+            {
+
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                                  policy =>
+                                  {
+#if !DEBUG
+                                        var withOrigins = Configuration.GetSection("WithOrigins").Value;
+                                        if (!string.IsNullOrEmpty(withOrigins))
+                                        {
+                                            var origins = withOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                                            policy.WithOrigins(origins)
+                                            .AllowAnyHeader()
+                                            .AllowAnyMethod();
+                                        }
+#endif
+                                  });
+            });
+#endregion
 
             builder.Services.AddProblemDetails(ConfigureProblemDetails);
 
@@ -265,6 +296,15 @@ namespace Boilerplate.Web
 
 
             var app = builder.Build();
+#if DEBUG
+            // https://docs.microsoft.com/ko-kr/aspnet/core/fundamentals/http-logging/?view=aspnetcore-6.0
+            // HTTP 로깅은 HTTP 로깅 미들웨어를 추가하는 UseHttpLogging을 통해 사용할 수 있습니다
+            app.UseHttpLogging();
+
+            // https://docs.microsoft.com/ko-kr/aspnet/core/fundamentals/w3c-logger/?view=aspnetcore-6.0
+            // W3CLogger 미들웨어를 추가하는 UseW3CLogging을 사용하여 W3CLogger를 사용 설정됩니다
+            //app.UseW3CLogging();
+#endif
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -329,6 +369,7 @@ namespace Boilerplate.Web
 
             app.UseRouting();
 
+            app.UseCors(MyAllowSpecificOrigins);
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -374,8 +415,14 @@ namespace Boilerplate.Web
 
             if (isService)
             {
-                app.Urls.Add("https://localhost:7298");
-                app.Urls.Add("http://localhost:5298");
+                var applicationUrls = Configuration.GetSection("ApplicationUrls").Value;
+                if (!string.IsNullOrEmpty(applicationUrls))
+                {
+                    foreach(var url in applicationUrls.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        app.Urls.Add(url);
+                    }
+                }
             }
 
             return app;
