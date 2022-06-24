@@ -363,10 +363,14 @@ namespace Boilerplate.Web
 
             CreateDbIfNotExistsAsync(app).Wait();
 
-            Console.WriteLine($"ApplicationName: {builder.Environment.ApplicationName}");
-            Console.WriteLine($"Environment Mode: {builder.Environment.EnvironmentName}");
-            Console.WriteLine($"ContentRoot Path: {builder.Environment.ContentRootPath}");
-            Console.WriteLine($"WebRootPath: {builder.Environment.WebRootPath}");
+            app.Logger.LogInformation("-----------------------------------------------------------------");
+            app.Logger.LogInformation("-----------------------------------------------------------------");
+            app.Logger.LogInformation($"ApplicationName: {builder.Environment.ApplicationName}");
+            app.Logger.LogInformation($"Environment Mode: {builder.Environment.EnvironmentName}");
+            app.Logger.LogInformation($"ContentRoot Path: {builder.Environment.ContentRootPath}");
+            app.Logger.LogInformation($"WebRootPath: {builder.Environment.WebRootPath}");
+            app.Logger.LogInformation("-----------------------------------------------------------------");
+            app.Logger.LogInformation("-----------------------------------------------------------------");
 
             if (isService)
             {
